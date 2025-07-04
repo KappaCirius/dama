@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<module name="Checker">
+    <!-- Analizza l'Abstract Syntax Tree -->
+    <module name="TreeWalker">
+
+        <!-- Regole di naming -->
+        <module name="PackageName"/>
+        <module name="TypeName"/>
+        <module name="MethodName"/>
+        <module name="ConstantName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+
+        <!-- Javadoc obbligatorio su classi, metodi pubblici -->
+        <module name="JavadocType"/>
+        <module name="JavadocMethod"/>
+
+        <!-- Altre regole di formattazione -->
+        <module name="NoWhitespaceBefore"/>
+        <module name="WhitespaceAfter"/>
+
+    </module>
+</module>

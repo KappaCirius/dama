@@ -4,29 +4,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classe che implementa l’IA utilizzando l’algoritmo minimax con alpha-beta pruning
- * per ottimizzare la ricerca.
+ * IA basata su Minimax con potatura alpha-beta.
+ * Fornisce metodi statici per calcolare la mossa migliore.
  */
-public class MinMax
-{
+public final class MinMax {
+
+    /** Profondità massima della ricerca Minimax. */
     private static final int MAX_DEPTH = 3;
 
-    /**
-     * Restituisce la mossa migliore per l'IA
-     * @param controller
-     * @return minimaxDecision(controller.getBoard(), MAX_DEPTH, false)
-     */
-    public static Move getBestMove(Controller controller) { return minimaxDecision(controller.getBoard(), MAX_DEPTH, false); }
+    /** Costruttore privato: classe di utilità con soli metodi statici. */
+    private MinMax() {
+        // no instances
+    }
 
     /**
-     * Metodo minimax che utilizza l'IA per scegliere la mossa migliore da eseguire
-     * @param board
-     * @param depth
-     * @param whiteTurn
-     * @return bestMove
+     * Restituisce la mossa migliore calcolata dall'IA.
+     *
+     * @param controller controller del gioco
+     *
+     * @return mossa migliore trovata oppure null se non esiste
      */
-    private static Move minimaxDecision(Board board, int depth, boolean whiteTurn)
-    {
+    public static Move getBestMove(final Controller controller) {
+        return minimaxDecision(controller.getBoard(), MAX_DEPTH, false);
+    }
+
+    /**
+     * Esegue la decisione Minimax con alpha-beta sullo stato corrente.
+     *
+     * @param board     scacchiera di partenza
+     * @param depth     profondità massima di ricerca
+     * @param whiteTurn true se tocca al bianco
+     * @return la mossa ritenuta migliore, o null se nessuna
+     */
+    private static Move minimaxDecision(final Board board,
+                                        final int depth,
+                                        final boolean whiteTurn) {
         List<Move> moves = getAllMoves(board, whiteTurn);
         Move bestMove = null;
 
@@ -34,143 +46,160 @@ public class MinMax
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
 
-        for (Move move : moves)
-        {
+        for (Move move : moves) {
             Board newBoard = board.clone();
-            Piece piece = newBoard.getPiece(move.getStartRow(), move.getStartCol());
+            Piece piece = newBoard.getPiece(move.getStartRow(),
+                    move.getStartCol());
             newBoard.setPiece(move.getEndRow(), move.getEndCol(), piece);
             newBoard.setPiece(move.getStartRow(), move.getStartCol(), null);
 
-            if (move.isCapture())
-                newBoard.setPiece(move.getCapturedRow(), move.getCapturedCol(), null);
-
-            int boardValue = minimax(newBoard, depth - 1, !whiteTurn, alpha, beta);
-
-            if (whiteTurn)
-            {
-                if (boardValue < bestValue)
-                {
-                    bestValue = boardValue;
-                    bestMove = move;
-                }
-
-                beta = Math.min(beta, bestValue);
+            if (move.isCapture()) {
+                newBoard.setPiece(move.getCapturedRow(),
+                        move.getCapturedCol(), null);
             }
-            else
-            {
-                if (boardValue > bestValue)
-                {
+
+            int boardValue = minimax(newBoard, depth - 1, !whiteTurn,
+                    alpha, beta);
+
+            if (whiteTurn) {
+                // minimizza per il bianco
+                if (boardValue < bestValue) {
                     bestValue = boardValue;
                     bestMove = move;
                 }
-
+                beta = Math.min(beta, bestValue);
+            } else {
+                // massimizza per il nero
+                if (boardValue > bestValue) {
+                    bestValue = boardValue;
+                    bestMove = move;
+                }
                 alpha = Math.max(alpha, bestValue);
             }
 
-            if (beta <= alpha)
+            if (beta <= alpha) {
                 break;
+            }
         }
 
         return bestMove;
     }
 
     /**
-     * Metodo che utilizza l'IA con l'algoritmo minimax alpha-beta pruning
-     * @param board
-     * @param depth
-     * @param whiteTurn
-     * @param alpha
-     * @param beta
-     * @return value
+     * Minimax con potatura alpha-beta.
+     *
+     * @param board     scacchiera
+     * @param depth     profondità residua
+     * @param whiteTurn true se tocca al bianco
+     * @param alpha     limite inferiore
+     * @param beta      limite superiore
+     *
+     * @return valore della posizione dal punto di vista del nero
      */
-    private static int minimax(Board board, int depth, boolean whiteTurn, int alpha, int beta)
-    {
-        if (depth == 0)
+    private static int minimax(final Board board,
+                               final int depth,
+                               final boolean whiteTurn,
+                               final int alpha,
+                               final int beta) {
+        int a = alpha;
+        int b = beta;
+
+        if (depth == 0) {
             return evaluateBoard(board);
+        }
 
         List<Move> moves = getAllMoves(board, whiteTurn);
 
-        if (moves.isEmpty())
+        if (moves.isEmpty()) {
             return whiteTurn ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        }
 
         int value = Integer.MIN_VALUE;
 
-        for (Move move : moves)
-        {
+        for (Move move : moves) {
             Board newBoard = board.clone();
-            Piece piece = newBoard.getPiece(move.getStartRow(), move.getStartCol());
+            Piece piece = newBoard.getPiece(move.getStartRow(),
+                    move.getStartCol());
             newBoard.setPiece(move.getEndRow(), move.getEndCol(), piece);
             newBoard.setPiece(move.getStartRow(), move.getStartCol(), null);
 
-            if (move.isCapture())
-                newBoard.setPiece(move.getCapturedRow(), move.getCapturedCol(), null);
+            if (move.isCapture()) {
+                newBoard.setPiece(move.getCapturedRow(),
+                        move.getCapturedCol(), null);
+            }
 
-            value = Math.max(value, minimax(newBoard, depth - 1, !whiteTurn, alpha, beta));
-            alpha = Math.max(alpha, value);
+            value = Math.max(value,
+                    minimax(newBoard, depth - 1, !whiteTurn, a, b));
+            a = Math.max(a, value);
 
-            if (beta <= alpha)
+            if (b <= a) {
                 break;
+            }
         }
 
         return value;
-
     }
 
     /**
-     * Metodo che utilizza l'IA per valutare la scacchiera dal punto di vista del giocatore nero
-     * @param board
-     * @return value
+     * Valuta la scacchiera dal punto di vista del nero.
+     * I pezzi neri sommano il punteggio, i bianchi lo sottraggono.
+     *
+     * @param board scacchiera
+     *
+     * @return valore stimato della posizione
      */
-    private static int evaluateBoard(Board board)
-    {
+    private static int evaluateBoard(final Board board) {
         int value = 0;
 
-        for (int i = 0; i < Board.SIZE; i++)
-            for (int j = 0; j < Board.SIZE; j++)
-            {
+        for (int i = 0; i < Board.SIZE; i++) {
+            for (int j = 0; j < Board.SIZE; j++) {
                 Piece p = board.getPiece(i, j);
-
-                if (p != null)
-                {
+                if (p != null) {
                     int pieceValue = p.isKing() ? 2 : 1;
-
-                    if (p.isWhite())
+                    if (p.isWhite()) {
                         value -= pieceValue;
-                    else
+                    } else {
                         value += pieceValue;
+                    }
                 }
             }
+        }
 
         return value;
     }
 
     /**
-     * Metodo che restituisce tutte le mosse possibili e le restituisce
-     * @param board
-     * @param forWhite
-     * @return moves
+     * Restituisce tutte le mosse possibili per il colore richiesto.
+     * Se esistono catture, restituisce solo le catture.
+     *
+     * @param board    scacchiera
+     * @param forWhite true per il bianco
+     *
+     * @return lista delle mosse
      */
-    private static List<Move> getAllMoves(Board board, boolean forWhite)
-    {
+    private static List<Move> getAllMoves(final Board board,
+                                          final boolean forWhite) {
         List<Move> moves = new ArrayList<>();
 
-        for (int i = 0; i < Board.SIZE; i++)
-            for (int j = 0; j < Board.SIZE; j++)
-            {
+        for (int i = 0; i < Board.SIZE; i++) {
+            for (int j = 0; j < Board.SIZE; j++) {
                 Piece p = board.getPiece(i, j);
-
-                if (p != null && p.isWhite() == forWhite)
+                if (p != null && p.isWhite() == forWhite) {
                     moves.addAll(Move.getPossibleMoves(board, i, j));
+                }
             }
+        }
 
         List<Move> captureMoves = new ArrayList<>();
-
-        for (Move m : moves)
-            if (m.isCapture())
+        for (Move m : moves) {
+            if (m.isCapture()) {
                 captureMoves.add(m);
+            }
+        }
 
-        if (!captureMoves.isEmpty())
+        if (!captureMoves.isEmpty()) {
             return captureMoves;
+        }
 
         return moves;
     }

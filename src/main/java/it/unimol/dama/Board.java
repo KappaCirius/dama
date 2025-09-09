@@ -3,8 +3,20 @@ package it.unimol.dama;
 /**
  * Classe che rappresenta la scacchiera del gioco della dama.
  */
-public class    Board {
+public class Board {
+    /**
+     * Dimensione della scacchiera (8x8).
+     */
     public static final int SIZE = 8;
+
+    /**
+     * Numero di righe iniziali occupate dalle pedine.
+     */
+    public static final int START_SIZE = 3;
+
+    /**
+     * Matrice dei pezzi presenti sulla scacchiera.
+     */
     private Piece[][] board;
 
     /**
@@ -23,9 +35,9 @@ public class    Board {
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 if ((row + col) % 2 == 1) {
-                    if (row < 3) {
+                    if (row < START_SIZE) {
                         board[row][col] = new Piece(false); // Nero
-                    } else if (row > 4) {
+                    } else if (row > SIZE - START_SIZE) {
                         board[row][col] = new Piece(true);  // Bianco
                     }
                 }
@@ -34,9 +46,10 @@ public class    Board {
     }
 
     /**
-     * Metodo di clonazione della scacchiera (utilizzato per favorire il funzionamento dell'IA).
+     * Metodo di clonazione della scacchiera.
+     * (utilizzato per favorire il funzionamento dell'IA)
      *
-     * @return una nuova istanza di Board con lo stesso stato della scacchiera attuale.
+     * @return nuova istanza di Board con lo stesso stato.
      */
     @Override
     public Board clone() {
@@ -58,8 +71,8 @@ public class    Board {
      *
      * @param row Riga della scacchiera.
      * @param col Colonna della scacchiera.
-     * @return Il pezzo presente nella posizione specificata, o null se la posizione
-     *         è fuori dai limiti o vuota.
+     * @return Il pezzo presente nella posizione specificata,
+     *         o null se la posizione è fuori dai limiti o vuota.
      */
     public Piece getPiece(final int row, final int col) {
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {

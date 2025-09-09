@@ -21,7 +21,7 @@ jobs:
         run: mvn clean install
 
       - name: Esegui Checkstyle
-        run: mvn checkstyle:check
+        run: mvn checkstyle:checkstyle
 
       - name: Esegui PMD
         run: mvn pmd:check

@@ -119,7 +119,7 @@ public class Move
                 int newRow = row + dr;
                 int newCol = col + dc;
 
-                if (isValidMove(board, row, col, newRow, newCol))
+                if (isValidMove(board, newRow, newCol))
                     moves.add(new Move(row, col, newRow, newCol));
             }
 
@@ -142,13 +142,11 @@ public class Move
     /**
      * Metodo che controlla se una mossa effettuata è valida o no
      * @param board
-     * @param row
-     * @param col
      * @param newRow
      * @param newCol
      * @return true se la mossa è valida, false altrimenti
      */
-    private static boolean isValidMove(Board board, int row, int col, int newRow, int newCol)
+    private static boolean isValidMove(Board board, int newRow, int newCol)
     {
         if (newRow < 0 || newRow >= Board.SIZE || newCol < 0 || newCol >= Board.SIZE)
             return false;
